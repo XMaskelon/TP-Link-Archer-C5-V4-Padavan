@@ -1,10 +1,8 @@
 #!/bin/bash
-# Меняем версию на 72.13
 sed -i 's/71\.4/72.13/g' padavan-ng/trunk/user/nfqws/Makefile
 
-# Выводим в лог содержимое старого патча, чтобы видеть, что именно он менял
-cat padavan-ng/trunk/user/nfqws/patches/firmware-specific.patch
-
-# Удаляем конфликтующий старый патч и добавляем правку Makefile прямо в процесс распаковки
-rm -f padavan-ng/trunk/user/nfqws/patches/firmware-specific.patch
-sed -i 's|tar zxf \$(SRC_ARCHIVE);|tar zxf $(SRC_ARCHIVE); sed -i "/^CC[[:space:]]*=/d" zapret-72.13/*/Makefile;|g' padavan-ng/trunk/user/nfqws/Makefile
+P=padavan-ng/trunk/user/nfqws/patches/firmware-specific.patch
+echo "=== ORIGINAL PATCH ==="; cat "$P"
+awk '/^(diff |--- )/{skip = ($0 ~ /(nfq|tpws)\/Makefile/)} !skip' "$P" > "$P.new" && mv "$P.new" "$P"
+echo "=== FILTERED PATCH ==="; cat "$P"
+echo "=== NFQWS MAKEFILE ==="; cat padavan-ng/trunk/user/nfqws/Makefile
